@@ -1,64 +1,18 @@
-
+#include "talkie.h"
 /*adding "const" before all PROGMEM declarations (i.e. "const uint8_t varNameSP[] PROGMEM...") in your sketch 
 in talkie.h, changing "void say(uint8_t* address);" to "void say(const uint8_t* address);"
 in talkie.cpp, changing "void Talkie::say(uint8_t* addr)" to "void Talkie::say(const uint8_t* addr)" 
 also in talkie.cpp, in the definition of Talkie::say(), changing "setPtr(addr);" to "setPtr((uint8_t*) addr);" */
 
-
-
-
-
-#include <SD.h>
-/* 
-Erics DIY Satellite Project
-My Youtube Channel  : http://www.youtube.com/user/Shadow5549
-Website http://mkme.org
-
-V1 Set up basic text tranmission
--Tuned speaker freq and speed
-
-V2 Added watchdog function
-
-V3- Added concept to hear the sound of space!  
-Take sensor input such as radiation or light level and map to tone output
-Currently Mapping Analog pin 0
-
-V4 Toggle TX mode (CW vs Tone) with millis
-Interval is used for length of time to send tone
-Satellite now transmits full CW downlink then tone for duration of "Interval"
-
-V5- Code cleanup.  Broke out into separate voids
-
-V6- Commented out watchdog functions as NANO was getting stuck in endless watchdog loop
-This is a confirmed bootloader problem here: http://forum.arduino.cc/index.php?topic=150419.0
-
-V7- Voice Downlink Development
-New version- no more morse instead using voice downlink
-Can re-use code up to V6 later in order to re activate/use the morse function
-
-
-********************************************
-Notes for DEV:
-Add code for external LED to indicate operational state
-External LEDs could also flash an error code if system probelm
-**********************************************
-
-
- 
-*/
-
 int SPKpin = 3; //Needs to be PWM pin for spk/radio output
 int Batt1;// Globalize Batt1 Variable
 int temp1 = 23;
 
-#include "talkie.h"
+
 
 Talkie voice;
 //Define what words you would like to use below
 //comment out what you dont need or import more from the talkie example sketches
-
-
-
 
 const uint8_t spZERO[]     PROGMEM = {0x69, 0xFB, 0x59, 0xDD, 0x51, 0xD5, 0xD7, 0xB5, 0x6F, 0x0A, 0x78, 0xC0, 0x52, 0x01, 0x0F, 0x50, 0xAC, 0xF6, 0xA8, 0x16, 0x15, 0xF2, 0x7B, 0xEA, 0x19, 0x47, 0xD0, 0x64, 0xEB, 0xAD, 0x76, 0xB5, 0xEB, 0xD1, 0x96, 0x24, 0x6E, 0x62, 0x6D, 0x5B, 0x1F, 0x0A, 0xA7, 0xB9, 0xC5, 0xAB, 0xFD, 0x1A, 0x62, 0xF0, 0xF0, 0xE2, 0x6C, 0x73, 0x1C, 0x73, 0x52, 0x1D, 0x19, 0x94, 0x6F, 0xCE, 0x7D, 0xED, 0x6B, 0xD9, 0x82, 0xDC, 0x48, 0xC7, 0x2E, 0x71, 0x8B, 0xBB, 0xDF, 0xFF, 0x1F};
 const uint8_t spONE[]      PROGMEM = {0x66, 0x4E, 0xA8, 0x7A, 0x8D, 0xED, 0xC4, 0xB5, 0xCD, 0x89, 0xD4, 0xBC, 0xA2, 0xDB, 0xD1, 0x27, 0xBE, 0x33, 0x4C, 0xD9, 0x4F, 0x9B, 0x4D, 0x57, 0x8A, 0x76, 0xBE, 0xF5, 0xA9, 0xAA, 0x2E, 0x4F, 0xD5, 0xCD, 0xB7, 0xD9, 0x43, 0x5B, 0x87, 0x13, 0x4C, 0x0D, 0xA7, 0x75, 0xAB, 0x7B, 0x3E, 0xE3, 0x19, 0x6F, 0x7F, 0xA7, 0xA7, 0xF9, 0xD0, 0x30, 0x5B, 0x1D, 0x9E, 0x9A, 0x34, 0x44, 0xBC, 0xB6, 0x7D, 0xFE, 0x1F};
